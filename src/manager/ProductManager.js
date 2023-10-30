@@ -1,11 +1,15 @@
 import fs from "fs";
 export class ProductManager {
   constructor() {
-    this.path = "./products.json";
+    this.path = "./src/products.json";
+    this.pathcarts = "./src/carts.json";
     this.idProduct = 1;
 
     if (!fs.existsSync(this.path)) {
       fs.writeFileSync(this.path, "[]");
+    }
+    if (!fs.existsSync(this.pathcarts)) {
+      fs.writeFileSync(this.pathcarts, "[]");
     }
   }
 
@@ -22,30 +26,28 @@ export class ProductManager {
     }
   }
 
-  async addProduct(title, description, price, thumbnail, code, stock) {
-    if (!title || !description || !price || !thumbnail || !code || !stock) {
-      return console.log("Falta informacion");
+  async addProduct(title, description, price, thumbnails, code, stock) {
+    if (!title || !description || !price || !thumbnails || !code || !stock) {
+      throw new Error("Falta informacion");
     }
+    const products = await this.getProducts();
     const newProduct = {
-      id: this.idProduct++,
+      id: products[products.length - 1].id + 1,
       title,
       description,
       price,
-      thumbnail,
+      thumbnails,
       code,
       stock,
+      status: true,
     };
-
-    try {
-      const datos = await this.getProducts();
-      if (datos.some((product) => product.code == code)) {
-        return console.log("El codigo ya esta siendo utilizado");
-      }
+    const datos = await this.getProducts();
+    if (datos.some((product) => product.code == code)) {
+      throw new Error("El codigo ya esta siendo utilizado.");
+    } else {
       datos.push(newProduct);
       await fs.promises.writeFile(this.path, JSON.stringify(datos));
       return console.log("Producto añadido con exito.");
-    } catch (error) {
-      console.log(error);
     }
   }
 
@@ -53,7 +55,7 @@ export class ProductManager {
     const products = await this.getProducts();
     const productFind = products.find((product) => product.id == id);
     if (!productFind) {
-      return -1;
+      throw new Error("ID no encontrado")
     } else {
       return productFind;
     }
@@ -73,20 +75,23 @@ export class ProductManager {
       }
     }
     if (j > 0) {
-      return console.log("ID no encontrado");
+      console.log("ID no encontrado");
+      throw new Error("ID no encontrado");
     }
     if (productos.length == 0) {
-      return console.log("Lista productos vacia.");
+      console.log("Lista productos vacia.");
+      throw new Error("Lista productos vacia.");
     }
   }
 
   async updateProduct(id, newInfo) {
+    console.log(newInfo);
     const products = await this.getProducts();
     const productToUpdate = products.findIndex((e) => e.id == id);
+    console.log(productToUpdate);
     if (productToUpdate >= 0) {
       if (products.some((e) => e.code == newInfo.code)) {
-        console.log("Codigo ya en uso.");
-        return -1;
+        throw new Error("Codigo ya en uso.");
       }
       products[productToUpdate] = {
         id: products[productToUpdate].id,
@@ -94,12 +99,39 @@ export class ProductManager {
         description:
           newInfo.description || products[productToUpdate].description,
         price: newInfo.price || products[productToUpdate].price,
-        thumbnail: newInfo.thumbnail || products[productToUpdate].thumbnail,
+        thumbnail: newInfo.thumbnails || products[productToUpdate].thumbnails,
         code: newInfo.code || products[productToUpdate].code,
         stock: newInfo.stock || products[productToUpdate].stock,
       };
       await fs.promises.writeFile(this.path, JSON.stringify(products));
       return console.log("Informacion actualizada.");
+    } else {
+      throw new Error("ID no encontrado.");
+    }
+  }
+
+  async createCart() {
+    const carts = await this.getCarts();
+    carts.push({ id: carts.length + 1, products: [] });
+    await fs.promises.writeFile(this.pathcarts, JSON.stringify(carts));
+  }
+
+  async updateCart(cart) {
+    await fs.promises.writeFile(this.pathcarts, JSON.stringify(cart));
+  }
+
+  async getCarts() {
+    const carts = await fs.promises.readFile(this.pathcarts, "utf-8");
+    return JSON.parse(carts);
+  }
+
+  async getCartByID(id) {
+    const carts = await this.getCarts();
+    const cartFind = carts.find((cart) => cart.id == id);
+    if (!cartFind) {
+      throw new Error("ID no encontrado");
+    } else {
+      return cartFind;
     }
   }
 }
