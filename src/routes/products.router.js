@@ -28,6 +28,7 @@ router.get("/:pid", async (req, res) => {
   try {
     const id = parseInt(req.params.pid);
     const products = await store.getProductByID(id);
+    console.log(products)
     // res.status(200).send(await store.getProductByID(id));
     res.render("home", { style: "products.css", products: { products } });
   } catch (error) {
@@ -40,7 +41,7 @@ router.post("/", async (req, res) => {
     const { title, description, code, price, stock, thumbnails } = req.body;
     await store.addProduct(title, description, price, thumbnails, code, stock);
     socketServer.emit("productos", await store.getProducts());
-    res.status(200).send("Producto agregado con exito.");
+    res.status(200).send({ message: "Producto agregado con exito." });
   } catch (error) {
     res.status(404).send({
       error: "No se pudo agregar el producto.",

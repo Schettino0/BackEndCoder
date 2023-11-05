@@ -44,22 +44,17 @@
         const code = datosFormulario.get('code')
         const stock = datosFormulario.get('stock')
         const producto = { title, description, price, thumbnails, code, stock }
-        console.log(producto)
 
         fetch('/api/products', {
             method: "POST",
             body: JSON.stringify(producto),
-            headers: { "Content-type": "application/json; charset=UTF-8" }
+            headers: { "Content-type": "application/json" }
         })
             .then(response => {
-                console.log(response)
-                // Aquí puedes manejar la respuesta de la solicitud
-                // Por ejemplo, puedes acceder a la respuesta con response.json()
-                // y realizar acciones basadas en la respuesta recibida
+                console.log(response.json())
             })
             .catch(error => {
-                console.log(error)
-                // Aquí puedes manejar cualquier error que ocurra durante la solicitud
+                console.log("Error!: " + error)
             });
     }
         ;</script>
