@@ -1,18 +1,23 @@
 import express from "express";
 import productsRouter from "./routes/products.router.js";
+import chatRouter from "./routes/chat.router.js";
 import handlebars from "express-handlebars";
 import cartsRouter from "./routes/carts.router.js";
 import __dirname from "./utils.js";
-import realtimeproducts from "./routes/realtimeproducts.router.js";
+import { errorHandler } from "./middlewares/errorHanlder.js";
 import { Server } from "socket.io";
-import { ProductManager } from "./manager/ProductManager.js";
+import * as service from "./services/chat.service.js"
+import { initMongoDB } from "./daos/mongodb/connection.js";
 
-const store = new ProductManager();
+const persistence = "MONGO";
+
 const PORT = 8080;
 const app = express();
 const httpServer = app.listen(PORT, () => {
   console.log("Server corriendo en puerto ", PORT);
 });
+
+if (persistence === "MONGO") await initMongoDB();
 
 const socketServer = new Server(httpServer);
 app.engine("handlebars", handlebars.engine());
@@ -21,16 +26,32 @@ app.set("view engine", "handlebars");
 app.use(express.static(__dirname + "/public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(errorHandler);
 
 // Routes
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
-app.use("/realtimeproducts", realtimeproducts);
+app.use("/chat", chatRouter);
 
-socketServer.on("connection", async (socket) => {
-  console.log("Nuevo Cliente conectado");
-  const productos = await store.getProducts();
-  socket.emit("productos", productos);
-});
+socketServer.on('connection', async(socket)=>{
+  console.log('🟢 ¡New connection!', socket.id);
+  socketServer.emit('messages', await service.getAll());
+
+  socket.on('disconnect', ()=>console.log('🔴 ¡User disconnect!', socket.id));
+  socket.on('newUser', (user)=>console.log(`⏩ ${user} inició sesión`));
+
+  socket.on('chat:message', async(msg)=>{
+      await service.createMessage(msg);
+      socketServer.emit('messages', await service.getAll());
+  })
+
+  socket.on('newUser', (user)=>{
+      socket.broadcast.emit('newUser', user)
+  })
+
+  socket.on('chat:typing', (data)=>{
+      socket.broadcast.emit('chat:typing', data)
+  })
+})
 
 export default socketServer;
