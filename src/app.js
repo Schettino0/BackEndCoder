@@ -6,7 +6,7 @@ import cartsRouter from "./routes/carts.router.js";
 import __dirname from "./utils.js";
 import { errorHandler } from "./middlewares/errorHanlder.js";
 import { Server } from "socket.io";
-import * as service from "./services/chat.service.js"
+import * as service from "./services/chat.service.js";
 import { initMongoDB } from "./daos/mongodb/connection.js";
 
 const persistence = "MONGO";
@@ -33,25 +33,38 @@ app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/chat", chatRouter);
 
-socketServer.on('connection', async(socket)=>{
-  console.log('🟢 ¡New connection!', socket.id);
-  socketServer.emit('messages', await service.getAll());
+let usuariosConectado = [];
 
-  socket.on('disconnect', ()=>console.log('🔴 ¡User disconnect!', socket.id));
-  socket.on('newUser', (user)=>console.log(`⏩ ${user} inició sesión`));
+socketServer.on("connection", async (socket) => {
+  // socketServer.emit("usuariosConectados",usuariosConectado)
+  console.log("🟢 ¡New connection!", socket.id);
+  socketServer.emit("messages", await service.getAll());
 
-  socket.on('chat:message', async(msg)=>{
-      await service.createMessage(msg);
-      socketServer.emit('messages', await service.getAll());
-  })
+  socket.on("disconnect", () => {
+    console.log("🔴 ¡User disconnect!", socket.id);
+    const sockeidBuscado = socket.id
+    usuariosConectado = usuariosConectado.filter(e => e.socketID !== sockeidBuscado) 
+    socketServer.emit("usuariosConectados", usuariosConectado);
 
-  socket.on('newUser', (user)=>{
-      socket.broadcast.emit('newUser', user)
-  })
+  });
+  socket.on("newUser", (user) => {
+    console.log(`⏩ ${user} inició sesión`);
+    usuariosConectado.push(user);
+    socketServer.emit("usuariosConectados", usuariosConectado);
+  });
 
-  socket.on('chat:typing', (data)=>{
-      socket.broadcast.emit('chat:typing', data)
-  })
-})
+  socket.on("chat:message", async (msg) => {
+    await service.createMessage(msg);
+    socketServer.emit("messages", await service.getAll());
+  });
+
+  socket.on("newUser", (user) => {
+    socket.broadcast.emit("newUser", user);
+  });
+
+  socket.on("chat:typing", (data) => {
+    socket.broadcast.emit("chat:typing", data);
+  });
+});
 
 export default socketServer;

@@ -2,6 +2,12 @@ const socket = io();
 
 let username = null;
 
+const message = document.getElementById("message");
+const btn = document.getElementById("send");
+const output = document.getElementById("output");
+const actions = document.getElementById("actions");
+const connected = document.getElementById("usuarios");
+
 if (!username) {
   Swal.fire({
     title: "¡Welcome to chat!",
@@ -12,14 +18,11 @@ if (!username) {
     },
   }).then((input) => {
     username = input.value;
-    socket.emit("newUser", username);
+    const socketID = socket.id
+    socket.emit("newUser", {username,socketID});
+    // connected.innerHTML += `<h5>🟢 ${username} </h5>`;
   });
 }
-
-const message = document.getElementById("message");
-const btn = document.getElementById("send");
-const output = document.getElementById("output");
-const actions = document.getElementById("actions");
 
 btn.addEventListener("click", () => {
   socket.emit("chat:message", {
@@ -30,37 +33,46 @@ btn.addEventListener("click", () => {
 });
 
 socket.on("messages", (data) => {
-  console.log(data)
+  console.log(data);
   actions.innerHTML = "";
   const chatRender = data
     .map((msg) => {
-      const time = msg.timestamp
-      const hora = time.substring(11,16)
+      const time = msg.timestamp;
+      const hora = time.substring(11, 16);
       return `<p><strong>${hora} -${msg.username} </strong>: ${msg.message}  </p> `;
     })
     .join(" ");
   output.innerHTML = chatRender;
 });
 
-socket.on('newUser', (username)=>{
-    Toastify({
-        text: `${username} is logged in`,
-        duration: 3000,
-        close: true,
-        // destination: 'http.....'
-        gravity: 'top',
-        position: 'right',
-        stopOnFocus: true,
-        style: {
-            background: "linear-gradient(to right, #00b09b, #96c93d)"
-        }
-    }).showToast();
+// socket.on("newUser", (username) => {
+//   Toastify({
+//     text: `${username} is logged in`,
+//     duration: 3000,
+//     close: true,
+//     // destination: 'http.....'
+//     gravity: "top",
+//     position: "right",
+//     stopOnFocus: true,
+//     style: {
+//       background: "linear-gradient(to right, #00b09b, #96c93d)",
+//     },
+//   }).showToast();
+
+// });
+
+message.addEventListener("keypress", () => {
+  socket.emit("chat:typing", username);
 });
 
-message.addEventListener('keypress', ()=>{
-    socket.emit('chat:typing', username)
-})
+socket.on("chat:typing", (data) => {
+  actions.innerHTML = `<p>${data} is writing a message...</p>`;
+});
 
-socket.on('chat:typing', (data)=>{
-    actions.innerHTML = `<p>${data} is writing a message...</p>`
-})
+socket.on("usuariosConectados", (data) => {
+  connected.innerHTML = ""
+    data.forEach((data) => {
+      connected.innerHTML += `<h5>🟢 ${data.username} </h5>`;
+    });
+  
+});
