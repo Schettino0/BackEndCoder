@@ -16,11 +16,11 @@ const app = express();
 const httpServer = app.listen(PORT, () => {
   console.log("Server corriendo en puerto ", PORT);
 });
-
 if (persistence === "MONGO") await initMongoDB();
 
 const socketServer = new Server(httpServer);
 app.engine("handlebars", handlebars.engine());
+
 app.set("views", __dirname + "/views");
 app.set("view engine", "handlebars");
 app.use(express.static(__dirname + "/public"));
@@ -42,10 +42,11 @@ socketServer.on("connection", async (socket) => {
 
   socket.on("disconnect", () => {
     console.log("🔴 ¡User disconnect!", socket.id);
-    const sockeidBuscado = socket.id
-    usuariosConectado = usuariosConectado.filter(e => e.socketID !== sockeidBuscado) 
+    const sockeidBuscado = socket.id;
+    usuariosConectado = usuariosConectado.filter(
+      (e) => e.socketID !== sockeidBuscado
+    );
     socketServer.emit("usuariosConectados", usuariosConectado);
-
   });
   socket.on("newUser", (user) => {
     console.log(`⏩ ${user} inició sesión`);

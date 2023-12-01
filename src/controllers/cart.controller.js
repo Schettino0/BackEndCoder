@@ -1,11 +1,52 @@
 import * as service from "../services/carts.service.js";
+import * as serviceProduct from "../services/products.service.js";
 
 export const getAll = async (req, res, next) => {
   try {
-    const carros = await service.getAll();
-    res.status(200).json(carros);
+    const response = await service.getAll();
+    if (!response) {
+      return res.status(401).json({ message: "No se encontraron carritos" });
+    } else {
+      return res.status(200).send(response);
+    }
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const cambiarCantidad = async (req, res, next) => {
+  try {
+    const { quantity } = req.body;
+    const { cid, pid } = req.params;
+    const response = await service.updateCart(cid, pid, quantity);
+    res.status(200).json(response);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getCart = async (req, res, next) => {
+  const detalles = [];
+
+  try {
+    const { cid } = req.params;
+    const cart = await service.getById(cid);
+    if (!cart) {
+      return res.status(401).json({ message: "No se encontraron carritos" });
+    } else {
+      const products = cart.products;
+      for (let index = 0; index < products.length; index++) {
+        const element = products[index];
+        let id = element._id.valueOf();
+        const detalle = await serviceProduct.getById(id);
+        detalles.push(detalle);
+      }
+    }
+
+    const data = combinarDetallesYCantidad(cart, detalles);
+    res.render("cart", { style: "cart.css", data, cid });
+  } catch (error) {
+    next(error.message);
   }
 };
 
@@ -37,10 +78,26 @@ export const create = async (req, res, next) => {
 
 export const remove = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const cartDel = await service.remove(id);
-    if (!cartDel) res.status(404).json({ msg: "Error Delete Cart" });
-    else res.status(200).json({ msg: "Carro eliminado" });
+    const { cid, pid } = req.params;
+    const cartDel = await service.remove(cid, pid);
+    if (!cartDel) res.status(404).json({ msg: "Error eliminado el producto" });
+    else res.status(200).json({ msg: "Prodcuto eliminado" });
+  } catch (error) {
+    next(error.message);
+  }
+};
+export const removeAll = async (req, res, next) => {
+  try {
+    const { cid } = req.params;
+    if (cid) {
+      const response = await service.removeAll(cid);
+      if (response)
+        res.status(200).json({ msg: "Todos los productos eliminados" });
+    } else {
+      res.status(500).json({
+        msg: "No se ha encontrado un carrito de compras para borrar todos sus productos",
+      });
+    }
   } catch (error) {
     next(error.message);
   }
@@ -49,11 +106,39 @@ export const remove = async (req, res, next) => {
 export const addProduct = async (req, res, next) => {
   try {
     const { cid, pid } = req.params;
-    const response = await service.addProduct(cid,pid);
-    if (!response) res.status(404).json({ msg: "Error"})
-    else res.status(200).json({msg: "Producto agregado"})
-    
+    const response = await service.addProduct(cid, pid);
+    if (!response) res.status(404).json({ msg: "Error" });
+    else res.status(200).json({ msg: "Producto agregado" });
   } catch (error) {
-    next(error.message)
+    next(error.message);
   }
 };
+
+function combinarDetallesYCantidad(response, detalles) {
+  let dataCombinada = [];
+  response.products.forEach((element) => {
+    dataCombinada.push({
+      cantidad: element.quantity,
+      producto: element._id.valueOf(),
+    });
+  });
+
+  dataCombinada.forEach((principal) => {
+    detalles.forEach((secundaria) => {
+      if (principal.producto == secundaria._id.valueOf()) {
+        principal.price = secundaria.price;
+        principal.stock = secundaria.stock;
+        principal.category = secundaria.category;
+        principal.title = secundaria.title;
+      } else {
+      }
+    });
+  });
+  let total = 0;
+  dataCombinada.forEach((element) => {
+    total += element.cantidad * element.price;
+  });
+  dataCombinada.total = total;
+  console.log(dataCombinada);
+  return dataCombinada;
+}

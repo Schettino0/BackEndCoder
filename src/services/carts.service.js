@@ -11,6 +11,14 @@ export const getAll = async () => {
   }
 };
 
+export const updateCart = async (cid, pid, quantity) => {
+  try {
+    return await cartDao.updateCantidad(cid, pid,quantity);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const getById = async (id) => {
   try {
     const carro = await cartDao.getById(id);
@@ -31,9 +39,9 @@ export const create = async () => {
   }
 };
 
-export const remove = async (id) => {
+export const remove = async (cid, pid) => {
   try {
-    const cartDel = await cartDao.remove(id);
+    const cartDel = await cartDao.remove(cid, pid);
     if (!cartDel) return false;
     else return cartDel;
   } catch (error) {
@@ -41,16 +49,28 @@ export const remove = async (id) => {
   }
 };
 
-export const addProduct = async (cid,pid)=>{
-    try {
-        const cart = await cartDao.getById(cid);
-        const product = pid
-        if(!cart || !product) return false;
-        else{
-            const response = await cartDao.addProductToCart(cart,product)
-            return response
-        }
-    } catch (error) {
-        console.log(error)
+export const addProduct = async (cid, pid) => {
+  try {
+    const cart = await cartDao.getById(cid);
+    const product = pid;
+    if (!cart || !product) return false;
+    else {
+      const response = await cartDao.addProductToCart(cart, product);
+      return response;
     }
-}
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const removeAll = async (cid) => {
+  try {
+    if (!cid) {
+      return false;
+    } else {
+      const response = await cartDao.removeAll(cid);
+      return true;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};

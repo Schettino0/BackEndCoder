@@ -4,6 +4,7 @@ import * as controller from "../controllers/product.controller.js";
 
 const router = Router();
 
+router.get("/?filter", controller.aggregation1);
 router.get("/", controller.getAll);
 router.get("/:id", controller.getById);
 router.post("/", controller.create);

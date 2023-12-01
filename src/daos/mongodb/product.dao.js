@@ -1,10 +1,27 @@
 import { ProductModel } from "./models/product.model.js";
 
 export default class ProductDaoMongoDB {
-  
-  async getAll() {
+  async aggregation1(filtro) {
+    console.log(filtro);
     try {
-      const response = await ProductModel.find({}).lean();
+      return await ProductModel.aggregate([
+        {
+          $match: {
+            category: filtro,
+          },
+        },
+      ]);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getAll(query, opciones) {
+    try {
+      const response = await ProductModel.paginate(
+        { category: query },
+        opciones
+      );
       return response;
     } catch (error) {
       console.log(error);
@@ -12,6 +29,15 @@ export default class ProductDaoMongoDB {
   }
 
   async getById(id) {
+    try {
+      const response = await ProductModel.findById(id).lean();
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getByIdJSON(id) {
     try {
       const response = await ProductModel.findById(id).lean();
       return response;

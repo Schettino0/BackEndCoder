@@ -1,11 +1,10 @@
-
 import ProductDaoMongoDB from "../daos/mongodb/product.dao.js";
 
 const prodDao = new ProductDaoMongoDB();
 
-export const getAll = async () => {
+export const getAll = async (query,opciones) => {
   try {
-    return await prodDao.getAll();
+    return await prodDao.getAll(query,opciones);
   } catch (error) {
     console.log(error);
   }
@@ -21,10 +20,19 @@ export const getById = async (id) => {
   }
 };
 
+
+
 export const create = async (obj) => {
   try {
-    if(!obj.title || !obj.description || !obj.price || !obj.thumbnails || !obj.code || !obj.stock ){
-      throw new Error ('Missing fields');
+    if (
+      !obj.title ||
+      !obj.description ||
+      !obj.price ||
+      !obj.thumbnails ||
+      !obj.code ||
+      !obj.stock
+    ) {
+      throw new Error("Missing fields");
     }
     const newProd = await prodDao.create(obj);
     if (!newProd) return false;
@@ -49,6 +57,15 @@ export const remove = async (id) => {
     const prodDel = await prodDao.delete(id);
     if (!prodDel) return false;
     else return prodDel;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const aggregation1 = async (filtro) => {
+  try {
+    const response = await prodDao.aggregation1(filtro);
+    return response;
   } catch (error) {
     console.log(error);
   }
