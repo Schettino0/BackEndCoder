@@ -11,7 +11,7 @@ export const aggregation1 = async (req, res, next) => {
   }
 };
 
-export const getAll = async (req, res, next) => {
+export const getAllView = async (req, res, next) => {
   try {
     let { limit = 8, page = 1, sort, query } = req.query;
     let sortBy = sort;
@@ -57,6 +57,48 @@ export const getAll = async (req, res, next) => {
   }
 };
 
+
+
+export const getAll = async (req, res, next) => {
+  try {
+    let { limit = 8, page = 1, sort, query } = req.query;
+    let sortBy = sort;
+    let categorias = ["Ropa", "Hogar", "Libros", "Electrónica", "Deportes"];
+    if (query) {
+      categorias = [query];
+    }
+    const limitValue = Number(limit);
+    const pageValue = Number(page);
+    const opciones = {
+      lean: true,
+      limit: limitValue,
+      page: pageValue,
+    };
+    if (sortBy) {
+      opciones.sort = { price: sortBy };
+    }
+    const resultado = await service.getAll(categorias, opciones);
+    resultado.status = "success";
+    resultado.nextLink = null;
+    resultado.prevLink = null;
+    resultado.payload = resultado.docs;
+    const products = resultado.payload;
+    delete resultado.docs;
+
+    if (resultado.hasPrevPage) {
+      resultado.prevPage = resultado.page - 1;
+      resultado.prevLink = `http://localhost:8080/api/products/?limit=${limit}&page=${resultado.prevPage}`;
+    }
+    if (resultado.hasNextPage) {
+      resultado.nextPage = resultado.page + 1;
+      resultado.nextLink = `http://localhost:8080/api/products/?limit=${limit}&page=${resultado.nextPage}`;
+    }
+    res.status(200).json({ resultado })
+  } catch (error) {
+    next(error.message);
+  }
+};
+
 export const getById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -64,7 +106,8 @@ export const getById = async (req, res, next) => {
     if (!response) {
       res.status(404).json({ msg: "Product Not found!" });
     } else {
-      res.render("home", { style: "products.css", products: { response } });
+      res.status(200).json({ product: response })
+      // res.render("home", { style: "products.css", products: { response } });
     }
   } catch (error) {
     next(error.message);

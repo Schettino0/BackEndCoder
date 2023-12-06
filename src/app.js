@@ -1,5 +1,6 @@
 import express from "express";
 import productsRouter from "./routes/products.router.js";
+import homeRouter  from "./routes/home.router.js";
 import chatRouter from "./routes/chat.router.js";
 import handlebars from "express-handlebars";
 import cartsRouter from "./routes/carts.router.js";
@@ -8,7 +9,6 @@ import { errorHandler } from "./middlewares/errorHanlder.js";
 import { Server } from "socket.io";
 import * as service from "./services/chat.service.js";
 import { initMongoDB } from "./daos/mongodb/connection.js";
-
 const persistence = "MONGO";
 
 const PORT = 8080;
@@ -32,6 +32,7 @@ app.use(errorHandler);
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/chat", chatRouter);
+app.use("/", homeRouter)
 
 let usuariosConectado = [];
 
