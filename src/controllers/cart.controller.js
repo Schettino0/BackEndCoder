@@ -24,10 +24,32 @@ export const cambiarCantidad = async (req, res, next) => {
     console.log(error);
   }
 };
-
 export const getCart = async (req, res, next) => {
   const detalles = [];
+  try {
+    const { cid } = req.params;
+    const cart = await service.getById(cid);
+    if (!cart) {
+      return res.status(401).json({ message: "No se encontraron carritos" });
+    } else {
+      const products = cart.products;
+      for (let index = 0; index < products.length; index++) {
+        const element = products[index];
+        let id = element._id.valueOf();
+        const detalle = await serviceProduct.getById(id);
+        detalles.push(detalle);
+      }
+    }
 
+    const data = combinarDetallesYCantidad(cart, detalles);
+    res.status(200).json({ data })
+  } catch (error) {
+    next(error.message);
+  }
+};
+
+export const getCartView = async (req, res, next) => {
+  const detalles = [];
   try {
     const { cid } = req.params;
     const cart = await service.getById(cid);
@@ -49,6 +71,9 @@ export const getCart = async (req, res, next) => {
     next(error.message);
   }
 };
+
+
+
 
 export const getById = async (req, res, next) => {
   try {
