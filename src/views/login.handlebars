@@ -1,0 +1,159 @@
+<div class="container">
+  <div class="form-container" id="login-container">
+    <form action="#" id="login-form">
+      <h2>Iniciar Sesión</h2>
+      <label for="login-email">Email:</label>
+      <input type="email" id="login-email" name="login-email" required />
+      <label for="login-password">Contraseña:</label>
+      <input
+        type="password"
+        id="login-password"
+        name="login-password"
+        required
+      />
+      <button type="submit">Iniciar Sesión</button>
+      <p>¿No tienes una cuenta?
+        <a href="#" id="register-link">Regístrate</a></p>
+    </form>
+  </div>
+  <div class="form-container" id="register-container" style="display: none;">
+    <form action="#" id="register-form">
+      <h2>Registrarse</h2>
+      <label for="first-name">Nombre:</label>
+      <input type="text" id="first-name" name="first-name" required />
+      <label for="last-name">Apellido:</label>
+      <input type="text" id="last-name" name="last-name" required />
+      <label for="register-email">Email:</label>
+      <input type="email" id="register-email" name="register-email" required />
+      <label for="edad">Edad:</label>
+      <input type="number" id="edad" name="edad" required />
+      <label for="register-password">Contraseña:</label>
+      <input
+        type="password"
+        id="register-password"
+        name="register-password"
+        required
+      />
+      <button type="submit">Registrarse</button>
+      <p>¿Ya tienes una cuenta?
+        <a href="#" id="login-link">Iniciar Sesión</a></p>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script >
+
+    const loginContainer = document.getElementById('login-container');
+    const loginForm = document.getElementById('login-form');
+    const loginLink = document.getElementById('login-link');
+    const registerContainer = document.getElementById('register-container');
+    const registerForm = document.getElementById('register-form');
+    const registerLink = document.getElementById('register-link');
+
+    registerLink.addEventListener('click', function (event) {
+        event.preventDefault();
+        loginContainer.style.display = 'none';
+        registerContainer.style.display = 'block';
+    });
+
+    loginLink.addEventListener('click', function (event) {
+        event.preventDefault();
+        loginContainer.style.display = 'block';
+        registerContainer.style.display = 'none';
+    });
+
+loginForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
+
+  fetch("http://localhost:8080/api/session/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email,
+      password: password,
+    })
+  })
+    .then(data=>{ 
+    if (data.status == 200) {
+      Swal.fire({
+        title: "Excelete!!",
+        text: "Inicio de sesion exitoso!",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setTimeout(function(){
+              window.location.href = "http://localhost:8080/products";
+      },2000)
+    }
+      if(data.status == 404){
+      Swal.fire({
+        title: "Error!",
+        text: "Los datos ingresados son incorrectos",
+        icon: "error",
+        showConfirmButton: false,
+        timer: 1500,
+      });        
+      }
+
+    })
+    .catch((error) => {
+      console.error("Error en la solicitud:", error);
+    });
+});
+
+registerForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+  const nombre = document.getElementById("first-name").value;
+  const apellido = document.getElementById("last-name").value;
+  const edad = document.getElementById("edad").value;
+  const email = document.getElementById("register-email").value;
+  const password = document.getElementById("register-password").value;
+
+  fetch("http://localhost:8080/api/session/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      first_name: nombre,
+      last_name: apellido,
+      email: email,
+      age: edad,
+      password: password,
+    }),
+  }).then((data) => {
+    if (data.status == 200) {
+      Swal.fire({
+        title: "Excelete!!",
+        text: "Tu cuenta ha sido creada con exito!",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setTimeout(function(){
+              window.location.href = "http://localhost:8080/login";
+      },3000)
+    }
+    if (data.status == 400) {
+      Swal.fire({
+        title: "Error!",
+        text: "Correo electronico ya en uso",
+        icon: "error",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  });
+});
+
+
+
+
+</script>

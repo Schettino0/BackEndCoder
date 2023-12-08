@@ -66,7 +66,7 @@ export const getCartView = async (req, res, next) => {
     }
 
     const data = combinarDetallesYCantidad(cart, detalles);
-    res.render("cart", { style: "cart.css", data, cid });
+    res.render("cart", { style: "cart.css", data, cid , session: req.session.info });
   } catch (error) {
     next(error.message);
   }
