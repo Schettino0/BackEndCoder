@@ -1,5 +1,7 @@
+import CartDaoMongoDB from "./cart.dao.js";
 import { UserModel } from "./models/user.model.js";
 
+const CartDao = new CartDaoMongoDB();
 export default class userManager {
   async getByEmail(email) {
     try {
@@ -12,7 +14,11 @@ export default class userManager {
 
   async createUser(user) {
     try {
-      const response = await UserModel.create(user);
+      const cart = await CartDao.create();
+      console.log(cart._id.valueOf());
+      const newUser = { ...user, cartID: cart._id.valueOf() };
+      const response = await UserModel.create(newUser);
+      console.log(response);
       if (response) return response;
     } catch (error) {
       console.log(error);
@@ -29,4 +35,3 @@ export default class userManager {
     }
   }
 }
-

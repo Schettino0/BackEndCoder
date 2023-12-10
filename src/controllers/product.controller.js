@@ -13,7 +13,6 @@ export const aggregation1 = async (req, res, next) => {
 
 export const getAllView = async (req, res, next) => {
   try {
-    console.log(req.session.info)
     let { limit = 8, page = 1, sort, query } = req.query;
     let sortBy = sort;
     let categorias = ["Ropa", "Hogar", "Libros", "Electrónica", "Deportes"];
@@ -46,6 +45,7 @@ export const getAllView = async (req, res, next) => {
       resultado.nextPage = resultado.page + 1;
       resultado.nextLink = `http://localhost:8080/api/products/?limit=${limit}&page=${resultado.nextPage}`;
     }
+    console.log(req.session.info)
     res.render("home", {
       style: "products.css",
       products,

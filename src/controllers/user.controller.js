@@ -28,6 +28,7 @@ export const login = async (req, res, next) => {
         first_name: user.first_name,
         last_name: user.last_name,
         role: user.role,
+        cartID: user.cartID,
         loggedIn: true,
       };
       res.status(200).json({ msg: user });
@@ -46,4 +47,10 @@ export const logout = async (req, res, next) => {
   }
 };
 
-
+export const perfil = async (req, res, next) => {
+  try {
+    const info = req.session.info
+    console.log(info)
+    res.render("perfil", {style: "perfil.css", info})
+  } catch (error) {}
+};

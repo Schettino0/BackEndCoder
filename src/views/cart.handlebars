@@ -3,17 +3,17 @@
     <li><a href="/products">Inicio</a></li>
     <li>Filtrar por categoría
       <ul>
-        <li><a href="?query=Hogar">Hogar</a></li>
-        <li><a href="?query=Deportes">Deportes</a></li>
-        <li><a href="?query=Electrónica">Electrónica</a></li>
-        <li><a href="?query=Ropa">Ropa</a></li>
-        <li><a href="?query=Libros">Libros</a></li>
+        <li><a href="http://localhost:8080/products/?query=Hogar">Hogar</a></li>
+        <li><a href="http://localhost:8080/products/?query=Deportes">Deportes</a></li>
+        <li><a href="http://localhost:8080/products/?query=Electrónica">Electrónica</a></li>
+        <li><a href="http://localhost:8080/products/?query=Ropa">Ropa</a></li>
+        <li><a href="http://localhost:8080/products/?query=Libros">Libros</a></li>
       </ul>
     </li>
-    <li><a href="http://localhost:8080/cart/6568dbb2d26183e385d11d0e">Ver carro</a></li>
+    <li><a href="http://localhost:8080/cart/{{session.cartID}}">Ver carro</a></li>
     <li>{{session.email}} ({{session.role}})
       <ul>
-        <li><a href="">Perfil</a></li>
+        <li><a href="http://localhost:8080/profile">Perfil</a></li>
         <li><a href="/logout">Cerrar Sesion</a></li>
       </ul>
           {{#if session.admin}}
@@ -52,7 +52,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  const cid = "{{cid}}"; 
+  const cid = "{{session.cartID}}"; 
   const limpiar= ()=>{
   fetch(`http://localhost:8080/api/carts/${cid}`, {method:'DELETE'}) 
   Swal.fire({
