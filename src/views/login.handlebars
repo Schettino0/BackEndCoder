@@ -12,6 +12,7 @@
         required
       />
       <button type="submit">Iniciar Sesión</button>
+      <button id="github-btn"><a href="http://localhost:8080/user/register-github">Iniciar/Registrar con GitHub</a></button>
       <p>¿No tienes una cuenta?
         <a href="#" id="register-link">Regístrate</a></p>
     </form>
@@ -69,7 +70,7 @@ loginForm.addEventListener("submit", function (event) {
   const email = document.getElementById("login-email").value;
   const password = document.getElementById("login-password").value;
 
-  fetch("http://localhost:8080/api/session/login", {
+  fetch("http://localhost:8080/user/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -92,7 +93,7 @@ loginForm.addEventListener("submit", function (event) {
               window.location.href = "http://localhost:8080/products";
       },2000)
     }
-      if(data.status == 404){
+      if(data.status == 401){
       Swal.fire({
         title: "Error!",
         text: "Los datos ingresados son incorrectos",
@@ -116,7 +117,7 @@ registerForm.addEventListener("submit", function (event) {
   const email = document.getElementById("register-email").value;
   const password = document.getElementById("register-password").value;
 
-  fetch("http://localhost:8080/api/session/register", {
+  fetch("http://localhost:8080/user/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

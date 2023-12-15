@@ -1,7 +1,7 @@
 import express from "express";
-import sessionRouter from "./routes/sessions.router.js";
+import userRouter from "./routes/user.router.js";
 import productsRouter from "./routes/products.router.js";
-import homeRouter from "./routes/home.router.js";
+import viewRouter from "./routes/views.router.js";
 import chatRouter from "./routes/chat.router.js";
 import cartsRouter from "./routes/carts.router.js";
 import handlebars from "express-handlebars";
@@ -13,8 +13,12 @@ import { connectionString, initMongoDB } from "./daos/mongodb/connection.js";
 import MongoStore from "connect-mongo";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-const persistence = "MONGO";
+import "./passport/local-strategy.js";
+import "./passport/github-strategy.js";
+import passport from "passport";
+//////////////////////////////////////////////////////////////
 
+const persistence = "MONGO";
 const PORT = 8080;
 const app = express();
 const httpServer = app.listen(PORT, () => {
@@ -51,12 +55,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(errorHandler);
 
-// Routes
+/////////////////////////////
+app.use(passport.initialize());
+app.use(passport.session());
+///////////////////////////////
+
+//////////////// Routes  ///////
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
-app.use("/api/session", sessionRouter);
+app.use("/user", userRouter);
 app.use("/chat", chatRouter);
-app.use("/", homeRouter);
+app.use("/", viewRouter);
 
 let usuariosConectado = [];
 

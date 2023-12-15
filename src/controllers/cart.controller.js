@@ -65,8 +65,11 @@ export const getCartView = async (req, res, next) => {
       }
     }
 
+    const { email, first_name, last_name, role, cartID } = req.user;
+    const info = { email, first_name, last_name, role, cartID, loggeIn: true };
+
     const data = combinarDetallesYCantidad(cart, detalles);
-    res.render("cart", { style: "cart.css", data, cid , session: req.session.info });
+    res.render("cart", { style: "cart.css", data, cid , session: info });
   } catch (error) {
     next(error.message);
   }

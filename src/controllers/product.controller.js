@@ -13,6 +13,9 @@ export const aggregation1 = async (req, res, next) => {
 
 export const getAllView = async (req, res, next) => {
   try {
+    const { email, first_name, last_name, role, cartID } = req.user;
+    const info = { email, first_name, last_name, role, cartID, loggeIn: true };
+    if (role == "admin") info.admin = true;
     let { limit = 8, page = 1, sort, query } = req.query;
     let sortBy = sort;
     let categorias = ["Ropa", "Hogar", "Libros", "Electrónica", "Deportes"];
@@ -45,14 +48,14 @@ export const getAllView = async (req, res, next) => {
       resultado.nextPage = resultado.page + 1;
       resultado.nextLink = `http://localhost:8080/api/products/?limit=${limit}&page=${resultado.nextPage}`;
     }
-    console.log(req.session.info)
+
     res.render("home", {
       style: "products.css",
       products,
       opciones: opciones,
       resultado,
       query: query,
-      session: req.session.info,
+      session: info,
     });
   } catch (error) {
     next(error.message);

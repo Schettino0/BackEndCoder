@@ -1,6 +1,6 @@
 export const alreadyLogged = (req, res, next) => {
-  const estado = req.session.info || false;
-  if (estado.loggedIn == true) {
+  const usuario = req.user || false;
+  if (usuario) {
     res.redirect("/products");
   } else {
     next();

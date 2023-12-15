@@ -19,7 +19,15 @@
             <li><a href="/logout">Cerrar Sesion</a></li>
           </ul>
           {{#if session.admin}}
-          <li>MENU ADMIN</li>
+          <li>MENU ADMIN
+              <ul>
+                <li>Configurar Productos</li>
+                <li>Configurar Usuarios</li>
+                <li>Etc...</li>
+              </ul>
+
+
+          </li>
           {{/if}}
 
         </li>

@@ -8,13 +8,16 @@ export const findByEmail = async (email) => {
 
 export const register = async (user) => {
   try {
-    const { email, password } = user;
-    if (email === "adminCoder@coder.com" && password === "adminCoder123") {
-      return await userDao.createUser({ ...user, role: "admin" });
+    if (user.isGitHub == true) {
+      const exists = await userDao.getByEmail(user.email);
+      if (!exists) return await userDao.createUser(user);
+      else return false;
+    } else {
+      const { email, password } = user;
+      if (email === "adminCoder@coder.com") {
+        return await userDao.createUser({ ...user, role: "admin" });
+      }
     }
-    const exists = await userDao.getByEmail(email);
-    if (!exists) return await userDao.createUser(user);
-    else return false;
   } catch (error) {
     console.log(error);
   }
@@ -22,7 +25,7 @@ export const register = async (user) => {
 
 export const login = async (email, password) => {
   try {
-    const userExist = await userDao.login( email, password );
+    const userExist = await userDao.login(email, password);
     if (!userExist) return false;
     else return userExist;
   } catch (error) {
