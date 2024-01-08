@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 
 const userSchema = new Schema({
   first_name: {
@@ -27,12 +27,17 @@ const userSchema = new Schema({
     default: "user",
   },
   cartID: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "cart",
   },
   isGitHub: {
     type: Boolean,
     default: false,
   },
+});
+
+userSchema.pre("find", function () {
+  this.populate("cart");
 });
 
 export const UserModel = model("users", userSchema);

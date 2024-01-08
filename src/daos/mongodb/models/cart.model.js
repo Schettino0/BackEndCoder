@@ -3,6 +3,10 @@ import mongoose, { Schema, model } from "mongoose";
 const collectionName = "carts";
 
 const collectionSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+  },
   products: [
     {
       product: {

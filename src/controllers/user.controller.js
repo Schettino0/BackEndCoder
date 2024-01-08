@@ -14,9 +14,9 @@ export const loginView = async (req, res, next) => {
 
 export const register = async (req, res, next) => {
   try {
-    req.body.password = createHash(req.body.password);
-    const user = await service.register(req.body);
-    res.status(200).json({ user });
+    // req.body.password = createHash(req.body.password);
+    // const user = await service.register(req.body);
+    res.status(200).json({ mgs: "Creado con exito" });
   } catch (error) {
     next(error.message);
   }
@@ -52,10 +52,11 @@ export const logout = async (req, res, next) => {
 
 export const perfil = async (req, res, next) => {
   try {
-    const { email, first_name, last_name, role, cartID } = req.user;
-    const info = { email, first_name, last_name, role, cartID, loggeIn: true };
+    let info = req.user.toObject();
     res.render("perfil", { style: "perfil.css", info });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const githubResponse = async (req, res, next) => {

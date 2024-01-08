@@ -1,6 +1,5 @@
 export const alreadyLogged = (req, res, next) => {
-  const usuario = req.user || false;
-  if (usuario) {
+  if (req.isAuthenticated()) {
     res.redirect("/products");
   } else {
     next();

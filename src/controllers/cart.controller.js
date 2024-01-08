@@ -1,5 +1,8 @@
+import userManager from "../daos/mongodb/user.dao.js";
 import * as service from "../services/carts.service.js";
 import * as serviceProduct from "../services/products.service.js";
+
+
 
 export const getAll = async (req, res, next) => {
   try {
@@ -42,7 +45,7 @@ export const getCart = async (req, res, next) => {
     }
 
     const data = combinarDetallesYCantidad(cart, detalles);
-    res.status(200).json({ data })
+    res.status(200).json({ data });
   } catch (error) {
     next(error.message);
   }
@@ -69,14 +72,11 @@ export const getCartView = async (req, res, next) => {
     const info = { email, first_name, last_name, role, cartID, loggeIn: true };
 
     const data = combinarDetallesYCantidad(cart, detalles);
-    res.render("cart", { style: "cart.css", data, cid , session: info });
+    res.render("cart", { style: "cart.css", data, cid, session: info });
   } catch (error) {
     next(error.message);
   }
 };
-
-
-
 
 export const getById = async (req, res, next) => {
   try {
@@ -167,6 +167,5 @@ function combinarDetallesYCantidad(response, detalles) {
     total += element.cantidad * element.price;
   });
   dataCombinada.total = total;
-  console.log(dataCombinada);
   return dataCombinada;
 }

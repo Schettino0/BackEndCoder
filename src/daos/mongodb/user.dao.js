@@ -19,7 +19,8 @@ export default class userManager {
       const newUser = { ...user, cartID: cart._id.valueOf() };
       if (user.password) newUser.password = createHash(user.password);
       const response = await UserModel.create(newUser);
-      console.log(response);
+      cart.user = response._id;
+      cart.save();
       if (response) return response;
     } catch (error) {
       console.log(error);

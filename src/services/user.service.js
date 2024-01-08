@@ -17,6 +17,7 @@ export const register = async (user) => {
       if (email === "adminCoder@coder.com") {
         return await userDao.createUser({ ...user, role: "admin" });
       }
+      return await userDao.createUser(user);
     }
   } catch (error) {
     console.log(error);
