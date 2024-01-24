@@ -12,6 +12,5 @@ router.get("/profile", validateLogin, controllerUser.perfil);
 router.get("/cart/:cid", validateLogin, controllerCart.getCartView);
 router.get("/login", alreadyLogged, controllerUser.loginView);
 router.get("/logout", controllerUser.logout);
-router.get("*", (req,res)=>{ res.redirect("/products")});
 
 export default router;

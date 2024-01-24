@@ -14,3 +14,20 @@ export const createHash = (password) => {
 export const isValidPass = (password, user) => {
   return compareSync(password, user.password);
 };
+
+export const generateRandomCode = (length) => {
+  const charset =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let code = "";
+
+  while (code.length < length) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    const randomChar = charset.charAt(randomIndex);
+
+    if (code.indexOf(randomChar) === -1) {
+      // El carácter no está repetido, añádelo al código
+      code += randomChar;
+    }
+  }
+  return code;
+};

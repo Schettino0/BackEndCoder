@@ -74,6 +74,7 @@ export default class CartDaoMongoDB {
   Ob;
   async remove(cid, pid) {
     try {
+      console.log(cid, pid);
       // const response = await CartModel.findByIdAndDelete(id);
       const cart = await CartModel.findById(cid);
       for (let index = 0; index < cart.products.length; index++) {
@@ -83,6 +84,7 @@ export default class CartDaoMongoDB {
           cart.save();
           return true;
         } else {
+          console.log("No se encontro " + pid + " En " + cid);
           return false;
         }
       }

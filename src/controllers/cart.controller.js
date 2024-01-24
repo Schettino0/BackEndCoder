@@ -1,7 +1,5 @@
-import userManager from "../daos/mongodb/user.dao.js";
 import * as service from "../services/carts.service.js";
 import * as serviceProduct from "../services/products.service.js";
-
 
 
 export const getAll = async (req, res, next) => {

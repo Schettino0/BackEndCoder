@@ -47,6 +47,7 @@
   <div class="final">
     <h3>Total: $ {{data.total}}</h3>
     <button onclick="limpiar()">Limpiar carro</button>
+    <button onclick="finalizar()" style="background-color: green; color:white;">Confirmar</button>
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -62,6 +63,11 @@
    timer: 1500 });
     setTimeout(function() {
   location.reload(); }, 2000);} 
+
+
+  const finalizar=()=>{
+    fetch(`http://localhost:8080/api/carts/${cid}/purchase`, {method:'GET'})
+  }
 
   const btnDisminuir = document.querySelectorAll("#disminuir");
   const btnAumentar = document.querySelectorAll("#aumentar");

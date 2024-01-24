@@ -13,4 +13,5 @@ router.use("/api/carts", cartsRouter);
 router.use("/user", userRouter);
 router.use("/chat", chatRouter);
 router.use("/", viewRouter);
+
 export default router;

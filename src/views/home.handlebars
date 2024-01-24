@@ -43,7 +43,7 @@
       <p>{{this.category}}</p>
       <p>{{this.description}}</p>
       <p>$ {{this.price}}</p>
-      <p>Stock: {{this.stock}}</p>
+      <span>Stock:</span><p id="stock">{{this.stock}}</p>
     <button id="addCart">Agregar al carrito</button>
     </div>
   {{/each}}
@@ -57,6 +57,7 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+
   const btnAddCart = document.querySelectorAll("#addCart")
   const limit= {{opciones.limit}}
   const page = {{opciones.page}}
@@ -69,7 +70,25 @@
   const btnNextPage = document.getElementById("btnNextPage")
   const btnPreviewPage = document.getElementById("btnPreviewPage")
   const pageNumber = document.getElementById("pageNumber")
-pageNumber.innerHTML = `${page} de ${totalPages}`;
+  pageNumber.innerHTML = `${page} de ${totalPages}`;
+
+
+function actualizarBotones() {
+  const product = document.querySelectorAll(".product");
+  product.forEach(function (element) {
+    const stock = element.children[7].innerHTML;
+    const btn = element.children[8];
+    if (stock == 0) {
+      btn.classList.add("agotado");
+      btn.innerHTML = "Agotado";
+    }
+  });
+}
+
+  actualizarBotones()
+
+
+
 if (hasNextPage) {
   btnNextPage.addEventListener("click", () => {
     if (sort && !query) {
@@ -113,12 +132,13 @@ if (hasPrevPage) {
 } else {
   btnPreviewPage.style.background = "grey";
 }
-
 const idCart = "{{session.cartID}}"
 
 
 btnAddCart.forEach(function (boton, indice) {
   boton.addEventListener("click", function () {
+    const stock = boton.parentElement.querySelector("#stock").innerHTML
+    if(stock>0){
     const div = boton.parentElement;
     const idProduct = div.querySelector("#idProduct");
     console.log(idProduct.innerHTML);
@@ -146,6 +166,14 @@ btnAddCart.forEach(function (boton, indice) {
     .catch(error=>{
       console.error("Error al realizar la solicitud POST" , error)
     })
+    }
   });
 });
+
+
+
+
+
+
+
 </script>

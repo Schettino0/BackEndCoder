@@ -1,6 +1,5 @@
 import userManager from "../daos/mongodb/user.dao.js";
 import * as service from "../services/user.service.js";
-import { createHash } from "../utils.js";
 const userDao = new userManager();
 // const userService = new UserServices();
 
@@ -36,9 +35,7 @@ export const login = async (req, res, next) => {
       };
       res.status(200).json({ msg: user });
     } else res.status(404).json({ msg: "Usuario o contraseña incorrecto" });
-  } catch (error) {
-    next(error.message);
-  }
+  } catch (error) {}
 };
 
 export const logout = async (req, res, next) => {
@@ -46,7 +43,7 @@ export const logout = async (req, res, next) => {
     req.session.destroy();
     res.redirect("/login");
   } catch (error) {
-    console.log(error);
+    next(error.message);
   }
 };
 
@@ -55,7 +52,7 @@ export const perfil = async (req, res, next) => {
     let info = req.user.toObject();
     res.render("perfil", { style: "perfil.css", info });
   } catch (error) {
-    console.log(error);
+    next(error.message);
   }
 };
 
