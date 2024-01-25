@@ -67,6 +67,11 @@
 
   const finalizar=()=>{
     fetch(`http://localhost:8080/api/carts/${cid}/purchase`, {method:'GET'})
+      Swal.fire({
+  title: "Excelete!!",
+   text: "Tcket fue creado con exito!", icon: "success",
+  showConfirmButton: false,
+   timer: 1500 });
   }
 
   const btnDisminuir = document.querySelectorAll("#disminuir");
@@ -127,13 +132,6 @@ btnAumentar.forEach(function (boton, indice) {
   setTimeout(function() {
   location.reload(); }, 2000);
     }
-    
-  
-  
-  
-  
-  
-  
   });
 });
 

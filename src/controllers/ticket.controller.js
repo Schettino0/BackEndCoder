@@ -31,16 +31,16 @@ export const finalizarCompra = async (req, res, next) => {
       purchaser: req.user.email,
     };
 
-    const ticketCrated = await createTicket(ticket);
-    console.log(productos)
-    if (ticketCrated) {
-      productos.forEach(async (element) => {
+    const ticketCreated = await createTicket(ticket);
+    console.log(ticketCreated)
+    if (ticketCreated) {
+      for (let index = 0; index < productos.length; index++) {
+        const element = productos[index];
         const response = await serviceCart.remove(cid, element._id.valueOf());
-        console.log(response)
-      });
+      }
     }
 
-    return res.status(200).json({ ticket: ticketCrated });
+    return res.status(200).json({ ticket: ticketCreated });
   } catch (error) {
     next(error.message);
   }
